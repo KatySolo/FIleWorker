@@ -61,5 +61,15 @@ public class FileWorker {
             }
         }
     }
+
+    public void concretizePath(String filename) {
+        this.path = new File(path+"/"+filename);
+        this.basicPath = new File(path+"/"+filename);
+    }
+
+//    public void concretizePath(String filename) {
+//        this.path = new File(newPath);
+//        this.basicPath = new File(newPath);
+//    }
 }
 
