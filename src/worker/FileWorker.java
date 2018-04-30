@@ -22,10 +22,11 @@ public class FileWorker {
         isRecursive = flag;
     }
 
-    public void execute(IExecutable command) {
+    public String execute(IExecutable command) {
+        StringBuilder hash = new StringBuilder();
         if (this.path.isFile()) {
             if (!this.path.getPath().endsWith("DS_Store")) {
-                command.process(this.path);
+                hash.append(command.process(this.path));
             }
         } else {
             if (getRecursive()) {
@@ -35,15 +36,15 @@ public class FileWorker {
                         if (file.isFile()) {
                             if (!file.getPath().endsWith("DS_Store")) {
                                 this.path = file;
-                                command.process(file);
+                                hash.append(command.process(file));
                             }
                         } else {
                             this.path = file;
-                            command.process(file);
+                            hash.append(command.process(file));
                         }
                     }
                 } else {
-                    command.process(this.path);
+                    hash.append(command.process(this.path));
                 }
 
             } else {
@@ -52,14 +53,15 @@ public class FileWorker {
                     for (File file : all_subs) {
                         if (!file.getPath().endsWith("DS_Store")) {
                             this.path = file;
-                            command.process(this.path);
+                            hash.append(command.process(this.path));
                         }
                     }
                 } else {
-                    command.process(this.path);
+                    hash.append(command.process(this.path));
                 }
             }
         }
+        return hash.toString();
     }
 
     public void concretizePath(String filename) {

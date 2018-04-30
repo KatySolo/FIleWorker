@@ -22,25 +22,30 @@ public class Md5Executor implements IExecutable {
     }
 
     @Override
-    public void process(File f) {
+    public String process(File f) {
+        StringBuilder innerHash = new StringBuilder();
         byte[] buffer = new byte[1024];
         int numRead;
         if (!f.isFile()) {
             File[] inner_files = f.listFiles();
             if (!fw.getRecursive()) {
-                formatOutput("<not seen>", f);
+//                formatOutput("<not seen>", f);
+                return "/" + getRelativePath(f) + ": " + "<not seen>" + '\n';
             } else if (inner_files != null) {
                 if (inner_files.length == 0) {
                     all_files_hash.put(getRelativePath(f), EMPTY_MD5_HASH);
-                    formatOutput(EMPTY_MD5_HASH, f);
+//                    formatOutput(EMPTY_MD5_HASH, f);
+                    return "/" + getRelativePath(f) + ": " + EMPTY_MD5_HASH + '\n';
                 } else {
                     for (File inner : inner_files) {
-                        process(inner);
+                        innerHash.append(process(inner));
                     }
-                    formatOutput(countDirectoryCache(f), f);
+                    return "/" + getRelativePath(f) + ": " + innerHash.toString() + '\n';
+//                    formatOutput(countDirectoryCache(f), f);
                 }
             } else {
-                formatOutput(EMPTY_MD5_HASH, f);
+//                formatOutput(EMPTY_MD5_HASH, f);
+                return "/" + getRelativePath(f) + ": " + EMPTY_MD5_HASH + '\n';
             }
         } else if (!f.getPath().endsWith("DS_Store")) {
             try {
@@ -59,12 +64,15 @@ public class Md5Executor implements IExecutable {
                 for (byte aB : md.digest()) {
                     result.append(Integer.toString((aB & 0xff) + 0x100, 16).substring(1));
                 }
-                formatOutput(result.toString(), f);
+//                formatOutput(result.toString(), f);
                 all_files_hash.put(getRelativePath(f), result.toString());
+                return "/" + getRelativePath(f) + ": " + result.toString() + '\n';
+
             } catch (NoSuchAlgorithmException | IOException e) {
                 e.printStackTrace();
             }
         }
+        return null;
     }
 
 
@@ -72,12 +80,12 @@ public class Md5Executor implements IExecutable {
         Path pathRelative = getRelativePath(f);
         BufferedWriter writer = null;
         try {
-            writer = new BufferedWriter(new FileWriter("/Users/KatySolo/IdeaProjects/file_worker/src/output/output.txt",true));
+            writer = new BufferedWriter(new FileWriter("/Users/KatySolo/IdeaProjects/FileWorker/out/production/file_worker/output/output.txt", true));
             String result = "/" + pathRelative + ": " + s;
             writer.append(result).append('\n');
             writer.close();
         } catch (FileNotFoundException e) {
-            File file = new File("/Users/KatySolo/IdeaProjects/file_worker/src/output/output.txt");
+            File file = new File("/Users/KatySolo/IdeaProjects/FileWorker/out/production/file_worker/output/output.txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
